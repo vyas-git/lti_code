@@ -1,0 +1,151 @@
+definitions:
+  model.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  model.RequestBody:
+    properties:
+      isrc:
+        type: string
+    required:
+    - isrc
+    type: object
+  model.TrackDetails:
+    properties:
+      artist:
+        type: string
+      image:
+        type: string
+      isrc:
+        type: string
+      popularity:
+        type: integer
+      primary_key:
+        type: integer
+      title:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /tracks/{isrc}:
+    get:
+      description: Search tracks from the database or Spotify by ISRC code
+      parameters:
+      - description: ISRC code of the track
+        in: path
+        name: isrc
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Track details
+          schema:
+            $ref: '#/definitions/model.TrackDetails'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Track not found for the given ISRC
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Search tracks by ISRC code
+      tags:
+      - GetTracks
+  /tracks/artist/{artist}:
+    get:
+      description: Retrieves tracks by the specified artist from the database or Spotify.
+      parameters:
+      - description: Artist name
+        in: path
+        name: artist
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved tracks
+          schema:
+            $ref: '#/definitions/model.TrackDetails'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get tracks by artist
+      tags:
+      - GetTracks
+  /tracks/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new track record in the database
+      parameters:
+      - description: Track details to create
+        in: body
+        name: track
+        required: true
+        schema:
+          $ref: '#/definitions/model.RequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Track details
+          schema:
+            $ref: '#/definitions/model.TrackDetails'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "409":
+          description: Track with ISRC code already exists
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Create a new track
+      tags:
+      - Create or Update Tracks
+  /tracks/update/{isrc}:
+    put:
+      consumes:
+      - application/json
+      description: Updates a track with the specified ISRC.
+      parameters:
+      - description: ISRC of the track
+        in: path
+        name: isrc
+        required: true
+        type: string
+      - description: Updated track details
+        in: body
+        name: existingTrack
+        required: true
+        schema:
+          $ref: '#/definitions/model.TrackDetails'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Track updated successfully
+          schema:
+            $ref: '#/definitions/model.TrackDetails'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Track not found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Update a track by ISRC
+      tags:
+      - Create or Update Tracks
+swagger: "2.0"
